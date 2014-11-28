@@ -10,7 +10,7 @@ from pygame.math import Vector2
 
 class GameEntity(object):
     """ The base object for any entity that will exist inside the game
-        world.  This class handles the rendering and processing each tick. """
+        world.  This class handles the drawing and processing each tick. """
 
     def __init__(self, world, name, image, draw_priority=10):
         self.world = world
@@ -33,7 +33,7 @@ class GameEntity(object):
         return self.name + ':' + str(self.entity_id) + ' - ' + \
                self.brain.active_state.name
 
-    def render(self, surface, font, debug_mode):
+    def draw(self, surface, font, debug_mode):
         """ Draws the entities image centered (horz and vert) on its
             current location. """
         x_point, y_point = self.location
@@ -47,7 +47,7 @@ class GameEntity(object):
                     surface.blit(font.render(debug_letter, True, (0, 0, 0)),
                                  self.location)
 
-    def process(self, time_passed):
+    def tick(self, time_passed):
         """ Triggers the entities StateMachine and locomotion """
         self.brain.think()
         if self.speed > 0 and self.location != self.destination:

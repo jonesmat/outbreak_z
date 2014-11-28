@@ -52,10 +52,10 @@ class Survivor(GameEntity):
         if self.health <= 0:
             self.brain.set_state('dead')
 
-    def render(self, surface, font, debug_mode):
-        """ Handles rendering of the entity """
-        # Call the render function of the base class
-        GameEntity.render(self, surface, font, debug_mode)
+    def draw(self, surface, font, debug_mode):
+        """ Handles drawing of the entity """
+        # Call the draw function of the base class
+        GameEntity.draw(self, surface, font, debug_mode)
 
         # Update survivor image to his alive image if he has restored health above 0.
         if self.was_hit and self.health > 0:
@@ -68,7 +68,7 @@ class Survivor(GameEntity):
             width, height = self.caution_image.get_size()
             surface.blit(self.caution_image, (x_point - width / 2, (y_point - height / 2) - 10))
 
-        # Debug rendering of target zombie line.
+        # Debug drawing of target zombie line.
         if debug_mode:
             if self.zombie_id:
                 zombie = self.world.get(self.zombie_id)

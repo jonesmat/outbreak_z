@@ -35,8 +35,8 @@ class World(object):
         else:
             return None
 
-    def process(self, time_passed):
-        """ Call the Process method of each GameEntity """
+    def tick(self, time_passed):
+        """ Call the tick method of each GameEntity """
         time_passed_seconds = time_passed / 1000.0
 
         self.supply += time_passed_seconds / 2
@@ -44,11 +44,11 @@ class World(object):
         local_entities = list(self.entities.values())
         for entity in local_entities:
             try:
-                entity.process(time_passed_seconds)
+                entity.tick(time_passed_seconds)
             except KeyError:
                 pass
 
-    def render(self, surface, font, debug_mode=False):
+    def draw(self, surface, font, debug_mode=False):
         """ Draw the background and all the entities based on thier
             draw order. """
         surface.blit(self.background, (0, 0))
@@ -58,7 +58,7 @@ class World(object):
                           key=lambda entity: entity.draw_priority)
 
         for entity in entities:
-            entity.render(surface, font, debug_mode)
+            entity.draw(surface, font, debug_mode)
 
     def get_close_entity(self, name, location, radius=100., ignore_id=None):
         """ Finds the first entity within range of a location """

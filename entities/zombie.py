@@ -27,12 +27,12 @@ class Zombie(GameEntity):
         self.survivor_id = 0
         self.health = 3
 
-    def render(self, surface, font, debug_mode):
-        """ Renders the Zombie class and then any debug graphics  """
-        # Call the render function of the base class
-        GameEntity.render(self, surface, font, debug_mode)
+    def draw(self, surface, font, debug_mode):
+        """ draws the Zombie class and then any debug graphics  """
+        # Call the draw function of the base class
+        GameEntity.draw(self, surface, font, debug_mode)
 
-        # Debug rendering of target survivor line.
+        # Debug drawing of target survivor line.
         if debug_mode:
             if self.survivor_id:
                 survivor = self.world.get(self.survivor_id)

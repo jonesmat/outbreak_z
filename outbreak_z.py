@@ -10,12 +10,9 @@ from scenes.game_scene import GameScene
 pygame.init()
 
 SCREEN_SIZE = (800, 600)
-screen = pygame.display.set_mode(SCREEN_SIZE, 0, 32)
-
-debug_mode = False
+surface = pygame.display.set_mode(SCREEN_SIZE, 0, 32)
 
 resources = Resources()
-resources.font = pygame.font.SysFont("arial", 16)
 
 active_scene = GameScene(SCREEN_SIZE, resources)
 
@@ -32,7 +29,7 @@ while True:
             if event.key == K_q or event.key == K_ESCAPE:
                 exit()
             if event.key == K_BACKQUOTE:
-                debug_mode = not debug_mode
+                active_scene.debugging = not active_scene.debugging
         if event.type == MOUSEBUTTONDOWN:
             if event.button == 1:
                 active_scene.handle_mouse_left_down(pygame.mouse.get_pos())
@@ -42,7 +39,7 @@ while True:
     time_passed = clock.tick(30)
 
     active_scene.tick(time_passed)
-    active_scene.draw(screen, debug_mode)
+    active_scene.draw(surface)
 
     pygame.display.update()
 
