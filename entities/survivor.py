@@ -173,7 +173,7 @@ class SurvivorStateAttacking(State):
 
 
 class SurvivorStateEvading(State):
-    """ Handles the survivor evading a zombie thats gotten too close. """
+    """ Handles the survivor evading a zombie that's gotten too close. """
 
     def __init__(self, survivor):
         # Call the base class constructor to init the State
@@ -181,13 +181,18 @@ class SurvivorStateEvading(State):
         # Set the survivor that this State will manipulate
         self.survivor = survivor
 
-    def run_away(self):
+    def do_actions(self):
+        # Occasionally make sure another zombie isn't closer.
+        if randint(1, 10) == 1:
+            self.choose_new_evade_target()
+
+    def choose_new_evade_target(self):
         """ Determines where the zombie is, then sets the destination for an
             area in the opposite direction. """
         # Try to first find a zombie that isn't feeding, its a lesser threat.
         zombie = self.survivor.world.get_close_entity_in_state("zombie", ["wandering", "seeking"],
                                                                self.survivor.location, 115)
-        # If you can't find a non-feeding zombie to run from, see if a 
+        # If you can't find a non-feeding zombie to run from, see if a
         # feeding one is close.
         if zombie is None:
             zombie = self.survivor.world.get_close_entity("zombie", self.survivor.location, 115)
@@ -208,11 +213,6 @@ class SurvivorStateEvading(State):
             x_point = abs(min([vec_away.x + randint(-20, 20), w_bound - 5]))
             y_point = abs(min([vec_away.y + randint(-20, 20), h_bound - 5]))
             self.survivor.destination = Vector2(x_point, y_point)
-
-    def do_actions(self):
-        # Occasionally make sure another zombie isn't closer.
-        if randint(1, 10) == 1:
-            self.run_away()
 
     def check_conditions(self):
         if self.survivor.evade_until is None:

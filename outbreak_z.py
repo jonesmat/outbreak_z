@@ -8,17 +8,12 @@ from scenes.game_scene import GameScene
 
 
 pygame.init()
-
 SCREEN_SIZE = (800, 600)
 surface = pygame.display.set_mode(SCREEN_SIZE, 0, 32)
-
-resources = Resources()
-
-active_scene = GameScene(SCREEN_SIZE, resources)
-
-active_scene.generate_world()
-
 clock = pygame.time.Clock()
+
+active_scene = GameScene(SCREEN_SIZE, Resources())
+active_scene.generate_world()
 
 while True:
 

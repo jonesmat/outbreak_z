@@ -30,8 +30,7 @@ class GameEntity(object):
         self.draw_priority = draw_priority
 
     def __str__(self):
-        return self.name + ':' + str(self.entity_id) + ' - ' + \
-               self.brain.active_state.name
+        return self.name + ':' + str(self.entity_id) + ' - ' + self.brain.active_state.name
 
     def draw(self, surface, font, debug_mode):
         """ Draws the entities image centered (horz and vert) on its
@@ -83,7 +82,7 @@ class GameEntity(object):
                 self.redirect_timer = None
 
     def _move_(self, time_passed):
-        """ Provides locomation for the entity while ensuring it stays
+        """ Provides locomotion for the entity while ensuring it stays
             within the world bounds. """
         vec_to_destination = self.destination - self.location
         distance_to_destination = vec_to_destination.length()
