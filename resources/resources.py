@@ -1,9 +1,13 @@
 """ Sets up all resources used by outbreak_z """
 
+import pygame
+
 
 class Resources(object):
     """ Contains all external resources used by the game. """
-    def __init__(self, pygame):
+
+    def __init__(self):
+        self.font = None
 
         self.background_image = pygame.image.load('resources/background.jpg').convert()
         self.zombie_image = pygame.image.load('resources/zombie.png').convert_alpha()
