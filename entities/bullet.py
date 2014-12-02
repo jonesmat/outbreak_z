@@ -12,26 +12,25 @@ from entities.game_base import GameEntity, State
 class Bullet(GameEntity):
     """ Bullet is fired from the Survivor when attacking. """
 
-    def __init__(self, world, image, blood_image):
-        GameEntity.__init__(self, world, "bullet", image)
+    def __init__(self, world, resource_mgr):
+        GameEntity.__init__(self, world, "bullet", resource_mgr.bullet_image, resource_mgr)
 
         # Create an instance of each of the states
-        seeking_state = BulletStateSeeking(self)
+        seeking_state = BulletStateSeeking(self, self.resource_mgr)
         # Add the states to the state machine
         self.brain.add_state(seeking_state)
-
-        self.blood_image = blood_image
         self.zombie_id = None
 
 
 class BulletStateSeeking(State):
     """ Controls the seeking of the Bullet towards its target """
 
-    def __init__(self, bullet):
+    def __init__(self, bullet, resource_mgr):
         # Call the base class constructor to init the State
         State.__init__(self, "seeking")
         # Set the survivor that this State will manipulate
         self.bullet = bullet
+        self.resource_mgr = resource_mgr
         self.zombie_id = None
 
     def do_actions(self):
@@ -43,8 +42,7 @@ class BulletStateSeeking(State):
                 if zombie.health <= 0:
                     self.bullet.world.remove_entity(zombie)
 
-                    blood = BloodSplat(self.bullet.world,
-                                       self.bullet.blood_image)
+                    blood = BloodSplat(self.bullet.world, self.resource_mgr)
                     blood.brain.set_state("fading")
                     blood.location = zombie.location
                     self.bullet.world.add_entity(blood)
@@ -70,12 +68,11 @@ class BulletStateSeeking(State):
 class BloodSplat(GameEntity):
     """ When Bullet meets Zombie, splat! """
 
-    def __init__(self, world, image):
+    def __init__(self, world, resource_mgr):
         # Set random image rotation.
         rotate = pygame.transform.rotate
         rotation = randint(1, 360)
-        GameEntity.__init__(self, world, "bloodsplat", rotate(image, rotation),
-                            draw_priority=5)
+        GameEntity.__init__(self, world, "bloodsplat", rotate(resource_mgr.blood_splat_image, rotation), resource_mgr)
 
         # Create an instance of each of the states
         fading_state = BloodStateFading(self)

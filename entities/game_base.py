@@ -12,10 +12,13 @@ class GameEntity(object):
     """ The base object for any entity that will exist inside the game
         world.  This class handles the drawing and processing each tick. """
 
-    def __init__(self, world, name, image, draw_priority=10):
+    def __init__(self, world, name, image, resource_mgr):
+        self.debug_mode = False
+
         self.world = world
         self.name = name
         self.image = image
+        self.resource_mgr = resource_mgr
         self.location = Vector2(0, 0)
         self.destination = Vector2(0, 0)
         self.speed = 0.
@@ -27,24 +30,19 @@ class GameEntity(object):
         self.prev_destination = None
         self.redirect_timer = None
 
-        self.draw_priority = draw_priority
-
     def __str__(self):
         return self.name + ':' + str(self.entity_id) + ' - ' + self.brain.active_state.name
 
-    def draw(self, surface, font, debug_mode):
-        """ Draws the entities image centered (horz and vert) on its
-            current location. """
+    def draw(self, surface):
         x_point, y_point = self.location
         width, height = self.image.get_size()
         surface.blit(self.image, (x_point - width / 2, y_point - height / 2))
 
-        if debug_mode:
+        if self.debug_mode:
             if self.brain is not None and self.brain.active_state is not None:
                 debug_letter = self.brain.active_state.name[:2]
                 if len(debug_letter) == 2:
-                    surface.blit(font.render(debug_letter, True, (0, 0, 0)),
-                                 self.location)
+                    surface.blit(self.resource_mgr.font.render(debug_letter, True, (0, 0, 0)), self.location)
 
     def tick(self, time_passed):
         """ Triggers the entities StateMachine and locomotion """

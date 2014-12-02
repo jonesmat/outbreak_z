@@ -14,15 +14,15 @@ class Survivor(GameEntity):
     """ The survivor entity...  """
     supply_cost = 3
 
-    def __init__(self, world, image, dead_image, hit_image, bullet_image, blood_image, caution_image):
-        GameEntity.__init__(self, world, 'survivor', image)
+    def __init__(self, world, resource_mgr):
+        GameEntity.__init__(self, world, 'survivor', resource_mgr.survivor_image, resource_mgr)
 
         # Create an instance of each of the states
         exploring_state = SurvivorStateExploring(self)
-        attacking_state = SurvivorStateAttacking(self)
+        attacking_state = SurvivorStateAttacking(self, self.resource_mgr)
         evading_state = SurvivorStateEvading(self)
         seeking_state = SurvivorStateSeeking(self)
-        dead_state = SurvivorStateDead(self, dead_image)
+        dead_state = SurvivorStateDead(self, resource_mgr.survivor_dead_image)
 
         # Add the states to the state machine
         self.brain.add_state(exploring_state)
@@ -31,12 +31,6 @@ class Survivor(GameEntity):
         self.brain.add_state(seeking_state)
         self.brain.add_state(dead_state)
 
-        self.alive_image = image
-        self.dead_image = dead_image
-        self.hit_image = hit_image
-        self.bullet_image = bullet_image
-        self.blood_image = blood_image
-        self.caution_image = caution_image
         self.health = 10
         self.was_hit = False
         self.ammo = 10
@@ -47,37 +41,38 @@ class Survivor(GameEntity):
     def bitten(self):
         """ Damages the survivor and checks for death. """
         self.health -= 1
-        self.image = self.hit_image
+        self.image = self.resource_mgr.survivor_hit_image
         self.was_hit = True
         if self.health <= 0:
             self.brain.set_state('dead')
 
-    def draw(self, surface, font, debug_mode):
+    def draw(self, surface):
         """ Handles drawing of the entity """
         # Call the draw function of the base class
-        GameEntity.draw(self, surface, font, debug_mode)
+        GameEntity.draw(self, surface)
 
         # Update survivor image to his alive image if he has restored health above 0.
         if self.was_hit and self.health > 0:
-            self.image = self.alive_image
+            self.image = self.resource_mgr.survivor_image
             self.was_hit = False
 
         # Draw caution icon above survivor if he's out of ammo.
         if self.ammo < 1 and self.health > 0:
             x_point, y_point = self.location
-            width, height = self.caution_image.get_size()
-            surface.blit(self.caution_image, (x_point - width / 2, (y_point - height / 2) - 10))
+            width, height = self.resource_mgr.caution_image.get_size()
+            surface.blit(self.resource_mgr.caution_image, (x_point - width / 2, (y_point - height / 2) - 10))
 
         # Debug drawing of target zombie line.
-        if debug_mode:
+        if self.debug_mode:
             if self.zombie_id:
                 zombie = self.world.get(self.zombie_id)
                 if zombie is not None:
                     pygame.draw.line(surface, (25, 100, 255), self.location, zombie.location)
             # blit ammo
-            surface.blit(font.render(str(self.ammo), True, (0, 0, 0)), self.location - Vector2(20, 0))
+            surface.blit(self.resource_mgr.font.render(str(self.ammo), True, (0, 0, 0)), self.location - Vector2(20, 0))
             # blit health
-            surface.blit(font.render(str(self.health), True, (0, 0, 0)), self.location - Vector2(5, 22))
+            surface.blit(self.resource_mgr.font.render(str(self.health), True, (0, 0, 0)),
+                         self.location - Vector2(5, 22))
 
 
 class SurvivorStateExploring(State):
@@ -122,17 +117,18 @@ class SurvivorStateAttacking(State):
     """ Once the survivor has a Zombie target, this state handles the
         targeting and shooting. """
 
-    def __init__(self, survivor):
+    def __init__(self, survivor, resource_mgr):
         # Call the base class constructor to init the State
         State.__init__(self, "attacking")
         # Set the survivor that this State will manipulate
         self.survivor = survivor
+        self.resource_mgr = resource_mgr
 
     def shoot_zombie(self):
         """ Acquires the zombie, spawns a bullet, and decrements the ammo """
         zombie = self.survivor.world.get(self.survivor.zombie_id)
         if zombie is not None:
-            bullet = Bullet(self.survivor.world, self.survivor.bullet_image, self.survivor.blood_image)
+            bullet = Bullet(self.survivor.world, self.resource_mgr)
             bullet.location = self.survivor.location
             bullet.zombie_id = zombie.id
             bullet.brain.set_state("seeking")
@@ -311,5 +307,5 @@ class Supplies(GameEntity):
 
     """ Simple supply entity """
 
-    def __init__(self, world, image):
-        GameEntity.__init__(self, world, "supplies", image, draw_priority=6)
+    def __init__(self, world, resource_mgr):
+        GameEntity.__init__(self, world, "supplies", resource_mgr.supplies_image, resource_mgr)

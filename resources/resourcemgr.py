@@ -3,7 +3,7 @@
 import pygame
 
 
-class Resources(object):
+class ResourceMgr(object):
     """ Contains all external resources used by the game. """
 
     def __init__(self):

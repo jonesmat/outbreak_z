@@ -11,13 +11,13 @@ from entities.game_base import GameEntity, State
 class Zombie(GameEntity):
     """ The Zombie entity """
 
-    def __init__(self, world, image):
-        GameEntity.__init__(self, world, 'zombie', image)
+    def __init__(self, world, resource_mgr):
+        GameEntity.__init__(self, world, 'zombie', resource_mgr.zombie_image, resource_mgr)
 
         # Create an instance of state
         wandering_state = ZombieStateWandering(self)
         seeking_state = ZombieStateSeeking(self)
-        feeding_state = ZombieStateFeeding(self)
+        feeding_state = ZombieStateFeeding(self, resource_mgr)
 
         # Add the states to the state machine
         self.brain.add_state(wandering_state)
@@ -27,20 +27,20 @@ class Zombie(GameEntity):
         self.survivor_id = 0
         self.health = 3
 
-    def draw(self, surface, font, debug_mode):
+    def draw(self, surface):
         """ draws the Zombie class and then any debug graphics  """
         # Call the draw function of the base class
-        GameEntity.draw(self, surface, font, debug_mode)
+        GameEntity.draw(self, surface)
 
         # Debug drawing of target survivor line.
-        if debug_mode:
+        if self.debug_mode:
             if self.survivor_id:
                 survivor = self.world.get(self.survivor_id)
                 if survivor is not None:
                     pygame.draw.line(surface, (255, 25, 25), self.location,
                                      survivor.location)
             # blit health
-            surface.blit(font.render(str(self.health), True, (0, 0, 0)),
+            surface.blit(self.resource_mgr.font.render(str(self.health), True, (0, 0, 0)),
                          self.location - Vector2(5, 22))
 
 
@@ -123,11 +123,12 @@ class ZombieStateSeeking(State):
 class ZombieStateFeeding(State):
     """ The Feeding state handles eating a downed survivor. """
 
-    def __init__(self, zombie):
+    def __init__(self, zombie, resource_mgr):
         # Call the base class constructor to init the State
         State.__init__(self, "feeding")
         # Set the Zombie that this State will manipulate
         self.zombie = zombie
+        self.resource_mgr = resource_mgr
 
     def do_actions(self):
         # Bit the survivor
@@ -144,9 +145,8 @@ class ZombieStateFeeding(State):
                 self.zombie.world.remove_entity(survivor)
 
                 # Replace the survivor with a new zombie.
-                new_zombie = Zombie(self.zombie.world, self.zombie.image)
-                new_zombie.location = Vector2(survivor.location.x,
-                                              survivor.location.y)
+                new_zombie = Zombie(self.zombie.world, self.resource_mgr)
+                new_zombie.location = Vector2(survivor.location.x, survivor.location.y)
                 new_zombie.brain.set_state("wandering")
                 self.zombie.world.add_entity(new_zombie)
 
@@ -154,8 +154,7 @@ class ZombieStateFeeding(State):
                 return "wandering"
 
         # if no dead survivor is nearby, start wandering
-        survivor = self.zombie.world.get_close_entity_in_state("survivor",
-                                                               ["dead"], self.zombie.location, 15.)
+        survivor = self.zombie.world.get_close_entity_in_state("survivor", ["dead"], self.zombie.location, 15.)
         if survivor is None:
             self.zombie.survivor_id = 0
             return "wandering"

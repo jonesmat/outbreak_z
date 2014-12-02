@@ -3,7 +3,7 @@ from sys import exit
 import pygame
 from pygame.locals import QUIT, KEYDOWN, K_q, K_ESCAPE, K_BACKQUOTE, MOUSEBUTTONDOWN
 
-from resources.resources import Resources
+from resources.resourcemgr import ResourceMgr
 from scenes.game_scene import GameScene
 
 
@@ -12,7 +12,7 @@ SCREEN_SIZE = (800, 600)
 surface = pygame.display.set_mode(SCREEN_SIZE, 0, 32)
 clock = pygame.time.Clock()
 
-active_scene = GameScene(SCREEN_SIZE, Resources())
+active_scene = GameScene(SCREEN_SIZE, ResourceMgr())
 active_scene.generate_world()
 
 while True:
@@ -24,7 +24,7 @@ while True:
             if event.key == K_q or event.key == K_ESCAPE:
                 exit()
             if event.key == K_BACKQUOTE:
-                active_scene.debugging = not active_scene.debugging
+                active_scene.handle_tilde_key_down()
         if event.type == MOUSEBUTTONDOWN:
             if event.button == 1:
                 active_scene.handle_mouse_left_down(pygame.mouse.get_pos())

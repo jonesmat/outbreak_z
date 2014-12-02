@@ -8,9 +8,9 @@ from entities.survivor import Survivor, Supplies
 class World(object):
     """ The World class keeps track of all entities within its bounds. """
 
-    def __init__(self, resources, screen_bounds):
-        self.resources = resources
-        self.background = resources.background_image
+    def __init__(self, resource_mgr, screen_bounds):
+        self.resource_mgr = resource_mgr
+        self.background = resource_mgr.background_image
         self.bounds = screen_bounds
 
         self.entities = {}  # Store all the entities
@@ -48,17 +48,11 @@ class World(object):
             except KeyError:
                 pass
 
-    def draw(self, surface, font, debug_mode=False):
-        """ Draw the background and all the entities based on thier
-            draw order. """
+    def draw(self, surface):
         surface.blit(self.background, (0, 0))
 
-        # Sort entities by thier draw priority (lower draws first).
-        entities = sorted(self.entities.values(),
-                          key=lambda entity: entity.draw_priority)
-
-        for entity in entities:
-            entity.draw(surface, font, debug_mode)
+        for entity in self.entities.values():
+            entity.draw(surface)
 
     def get_close_entity(self, name, location, radius=100., ignore_id=None):
         """ Finds the first entity within range of a location """
@@ -108,7 +102,7 @@ class World(object):
         return None
 
     def get_entity_count(self, name):
-        """ Gets the number of entties in the world with that name. """
+        """ Gets the number of entities in the world with that name. """
         count = 0
         for entity in self.entities.values():
             if entity.name == name:
@@ -118,18 +112,17 @@ class World(object):
     def spawn_entity(self, entity_type, x_point, y_point):
         if self.supply - entity_type.supply_cost >= 0:
             if entity_type is Survivor:
-                survivor = Survivor(self, self.resources.survivor_image,
-                                    self.resources.survivor_dead_image,
-                                    self.resources.survivor_hit_image,
-                                    self.resources.bullet_image,
-                                    self.resources.blood_splat_image,
-                                    self.resources.caution_image)
+                survivor = Survivor(self, self.resource_mgr)
                 survivor.location = Vector2(x_point, y_point)
                 survivor.brain.set_state("exploring")
                 self.add_entity(survivor)
                 self.supply -= 3
             elif entity_type is Supplies:
-                supplies = Supplies(self, self.resources.supplies_image)
+                supplies = Supplies(self, self.resource_mgr)
                 supplies.location = Vector2(x_point, y_point)
                 self.add_entity(supplies)
                 self.supply -= 1
+
+    def set_debug_mode(self, debug_mode):
+        for entity in self.entities.values():
+            entity.debug_mode = debug_mode
