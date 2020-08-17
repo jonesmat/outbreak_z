@@ -55,8 +55,7 @@ class ZombieStateWandering(State):
 
     def do_actions(self):
         # Change direction occasionally
-        if randint(1, 350) == 1 or \
-                        self.zombie.location == self.zombie.destination:
+        if randint(1, 350) == 1 or self.zombie.location == self.zombie.destination:
             self.zombie.destination = self.zombie.get_random_destination()
 
     def check_conditions(self):
