@@ -1,7 +1,7 @@
 from time import time
 
 from entities.game_base import State
-from entities.zombie import Zombie
+from entities.zombie.entity import Zombie
 
 
 class GraveyardStateSpawning(State):

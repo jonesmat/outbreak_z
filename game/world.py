@@ -4,6 +4,7 @@ from pygame.math import Vector2
 
 from entities.survivor.entity import Survivor
 from entities.supplycrate.entity import SupplyCrate
+from entities.zombie.entity import Zombie
 
 
 class World(object):
@@ -127,3 +128,13 @@ class World(object):
     def set_debug_mode(self, debug_mode):
         for entity in self.entities.values():
             entity.debug_mode = debug_mode
+
+    def turn_survivor(self, survivor):
+        ''' Turns a survivor into a Zombie! '''
+            
+        self.remove_entity(survivor)
+
+        new_zombie = Zombie(self, self.resource_mgr)
+        new_zombie.location = Vector2(survivor.location.x, survivor.location.y)
+        new_zombie.brain.set_state("wandering")
+        self.add_entity(new_zombie)

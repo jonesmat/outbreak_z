@@ -1,47 +1,9 @@
-""" Module contains the Zombie class """
-
 from random import randint
 
 import pygame
 from pygame.math import Vector2
 
 from entities.game_base import GameEntity, State
-
-
-class Zombie(GameEntity):
-    """ The Zombie entity """
-
-    def __init__(self, world, resource_mgr):
-        GameEntity.__init__(self, world, 'zombie', resource_mgr.zombie_image, resource_mgr)
-
-        # Create an instance of state
-        wandering_state = ZombieStateWandering(self)
-        seeking_state = ZombieStateSeeking(self)
-        feeding_state = ZombieStateFeeding(self, resource_mgr)
-
-        # Add the states to the state machine
-        self.brain.add_state(wandering_state)
-        self.brain.add_state(seeking_state)
-        self.brain.add_state(feeding_state)
-
-        self.survivor_id = 0
-        self.health = 3
-
-    def draw(self, surface):
-        """ draws the Zombie class and then any debug graphics  """
-        # Call the draw function of the base class
-        GameEntity.draw(self, surface)
-
-        # Debug drawing of target survivor line.
-        if self.debug_mode:
-            if self.survivor_id:
-                survivor = self.world.get(self.survivor_id)
-                if survivor is not None:
-                    pygame.draw.line(surface, (255, 25, 25), self.location,
-                                     survivor.location)
-            # blit health
-            surface.blit(self.resource_mgr.font.render(str(self.health), True, (0, 0, 0)),
-                         self.location - Vector2(5, 22))
 
 
 class ZombieStateWandering(State):
@@ -136,22 +98,6 @@ class ZombieStateFeeding(State):
             survivor.bitten()
 
     def check_conditions(self):
-        # If survivor is consumed, start wandering
-        survivor = self.zombie.world.get(self.zombie.survivor_id)
-        if survivor is not None:
-            if survivor.health <= -200:
-                # Survivor is now consumed
-                self.zombie.world.remove_entity(survivor)
-
-                # Replace the survivor with a new zombie.
-                new_zombie = Zombie(self.zombie.world, self.resource_mgr)
-                new_zombie.location = Vector2(survivor.location.x, survivor.location.y)
-                new_zombie.brain.set_state("wandering")
-                self.zombie.world.add_entity(new_zombie)
-
-                self.zombie.survivor_id = 0
-                return "wandering"
-
         # if no dead survivor is nearby, start wandering
         survivor = self.zombie.world.get_close_entity_in_state("survivor", ["dead"], self.zombie.location, 15.)
         if survivor is None:

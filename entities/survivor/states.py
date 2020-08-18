@@ -226,6 +226,9 @@ class SurvivorStateDead(State):
     def check_conditions(self):
         if self.survivor.health >= 10:
             return "exploring"
+        
+        elif self.survivor.health <= -200:
+            self.survivor.world.turn_survivor(self.survivor)
 
         return None
 
