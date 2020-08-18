@@ -24,11 +24,11 @@ class GameScene(object):
         self.world.supply = 20
 
         # Spawn a few graveyards
-        for _ in range(0, 5):
-            graveyard = Graveyard(self.world, self.resource_mgr)
-            graveyard.location = Vector2(randint(0, self.world_size[0]), randint(0, self.world_size[1]))
-            graveyard.brain.set_state("spawning")
-            self.world.add_entity(graveyard)
+        #for _ in range(1, 5):
+        graveyard = Graveyard(self.world, self.resource_mgr)
+        graveyard.location = Vector2(randint(0, self.world_size[0]), randint(0, self.world_size[1]))
+        graveyard.brain.set_state("spawning")
+        self.world.add_entity(graveyard)
 
     def tick(self, time_passed):
         self.world.tick(time_passed)

@@ -16,24 +16,24 @@ class World(object):
         self.bounds = screen_bounds
 
         self.entities = {}  # Store all the entities
-        self.entity_id = 0  # Last entity id assigned
+        self.next_entity_id = 0  # Next entity id assigned
 
         self.supply = 0.0
 
     def add_entity(self, entity):
         """ Stores the entity then advances the current id """
-        self.entities[self.entity_id] = entity
-        entity.id = self.entity_id
-        self.entity_id += 1
+        self.entities[self.next_entity_id] = entity
+        entity.id = self.next_entity_id
+        self.next_entity_id += 1
 
     def remove_entity(self, entity):
         """ Removes the entity from the world """
         del self.entities[entity.id]
 
-    def get(self, entity_id):
+    def get(self, id):
         """ Find the entity, given its id """
-        if entity_id in self.entities:
-            return self.entities[entity_id]
+        if id in self.entities:
+            return self.entities[id]
         else:
             return None
 
