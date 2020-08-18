@@ -2,7 +2,9 @@
 
 from pygame.math import Vector2
 
-from entities.survivor import Survivor, Supplies
+from entities.survivor.entity import Survivor
+from entities.supplycrate.entity import SupplyCrate
+from entities.zombie.entity import Zombie
 
 
 class World(object):
@@ -14,24 +16,24 @@ class World(object):
         self.bounds = screen_bounds
 
         self.entities = {}  # Store all the entities
-        self.entity_id = 0  # Last entity id assigned
+        self.next_entity_id = 0  # Next entity id assigned
 
         self.supply = 0.0
 
     def add_entity(self, entity):
         """ Stores the entity then advances the current id """
-        self.entities[self.entity_id] = entity
-        entity.id = self.entity_id
-        self.entity_id += 1
+        self.entities[self.next_entity_id] = entity
+        entity.id = self.next_entity_id
+        self.next_entity_id += 1
 
     def remove_entity(self, entity):
         """ Removes the entity from the world """
         del self.entities[entity.id]
 
-    def get(self, entity_id):
+    def get(self, id):
         """ Find the entity, given its id """
-        if entity_id in self.entities:
-            return self.entities[entity_id]
+        if id in self.entities:
+            return self.entities[id]
         else:
             return None
 
@@ -117,12 +119,22 @@ class World(object):
                 survivor.brain.set_state("exploring")
                 self.add_entity(survivor)
                 self.supply -= 3
-            elif entity_type is Supplies:
-                supplies = Supplies(self, self.resource_mgr)
-                supplies.location = Vector2(x_point, y_point)
-                self.add_entity(supplies)
+            elif entity_type is SupplyCrate:
+                supplycrate = SupplyCrate(self, self.resource_mgr)
+                supplycrate.location = Vector2(x_point, y_point)
+                self.add_entity(supplycrate)
                 self.supply -= 1
 
     def set_debug_mode(self, debug_mode):
         for entity in self.entities.values():
             entity.debug_mode = debug_mode
+
+    def turn_survivor(self, survivor):
+        ''' Turns a survivor into a Zombie! '''
+            
+        self.remove_entity(survivor)
+
+        new_zombie = Zombie(self, self.resource_mgr)
+        new_zombie.location = Vector2(survivor.location.x, survivor.location.y)
+        new_zombie.brain.set_state("wandering")
+        self.add_entity(new_zombie)

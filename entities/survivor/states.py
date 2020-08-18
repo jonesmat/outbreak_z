@@ -1,78 +1,10 @@
-""" This module contains the Survivor class and its States. """
-
 from random import randint
 from time import time
 
-import pygame
 from pygame.math import Vector2
 
-from entities.game_base import GameEntity, State
-from entities.bullet import Bullet
-
-
-class Survivor(GameEntity):
-    """ The survivor entity...  """
-    supply_cost = 3
-
-    def __init__(self, world, resource_mgr):
-        GameEntity.__init__(self, world, 'survivor', resource_mgr.survivor_image, resource_mgr)
-
-        # Create an instance of each of the states
-        exploring_state = SurvivorStateExploring(self)
-        attacking_state = SurvivorStateAttacking(self, self.resource_mgr)
-        evading_state = SurvivorStateEvading(self)
-        seeking_state = SurvivorStateSeeking(self)
-        dead_state = SurvivorStateDead(self, resource_mgr.survivor_dead_image)
-
-        # Add the states to the state machine
-        self.brain.add_state(exploring_state)
-        self.brain.add_state(attacking_state)
-        self.brain.add_state(evading_state)
-        self.brain.add_state(seeking_state)
-        self.brain.add_state(dead_state)
-
-        self.health = 10
-        self.was_hit = False
-        self.ammo = 10
-        self.zombie_id = 0
-
-        self.evade_until = None
-
-    def bitten(self):
-        """ Damages the survivor and checks for death. """
-        self.health -= 1
-        self.image = self.resource_mgr.survivor_hit_image
-        self.was_hit = True
-        if self.health <= 0:
-            self.brain.set_state('dead')
-
-    def draw(self, surface):
-        """ Handles drawing of the entity """
-        # Call the draw function of the base class
-        GameEntity.draw(self, surface)
-
-        # Update survivor image to his alive image if he has restored health above 0.
-        if self.was_hit and self.health > 0:
-            self.image = self.resource_mgr.survivor_image
-            self.was_hit = False
-
-        # Draw caution icon above survivor if he's out of ammo.
-        if self.ammo < 1 and self.health > 0:
-            x_point, y_point = self.location
-            width, height = self.resource_mgr.caution_image.get_size()
-            surface.blit(self.resource_mgr.caution_image, (x_point - width / 2, (y_point - height / 2) - 10))
-
-        # Debug drawing of target zombie line.
-        if self.debug_mode:
-            if self.zombie_id:
-                zombie = self.world.get(self.zombie_id)
-                if zombie is not None:
-                    pygame.draw.line(surface, (25, 100, 255), self.location, zombie.location)
-            # blit ammo
-            surface.blit(self.resource_mgr.font.render(str(self.ammo), True, (0, 0, 0)), self.location - Vector2(20, 0))
-            # blit health
-            surface.blit(self.resource_mgr.font.render(str(self.health), True, (0, 0, 0)),
-                         self.location - Vector2(5, 22))
+from entities.game_base import State
+from entities.bullet.entity import Bullet
 
 
 class SurvivorStateExploring(State):
@@ -100,9 +32,9 @@ class SurvivorStateExploring(State):
         # If there is a nearby pile of supplies, and the survivor is low, 
         # switch to seeking state
         if self.survivor.health < 10 or self.survivor.ammo < 10:
-            supplies = self.survivor.world.get_close_entity("supplies", self.survivor.location)
-            if supplies is not None:
-                self.survivor.supplies_id = supplies.id
+            supplycrate = self.survivor.world.get_close_entity("supplycrate", self.survivor.location)
+            if supplycrate is not None:
+                self.survivor.supplies_id = supplycrate.id
                 return "seeking"
 
         return None
@@ -255,13 +187,13 @@ class SurvivorStateSeeking(State):
             return "evading"
 
         # If the supplies are gone, go back to exploring
-        supplies = self.survivor.world.get(self.survivor.supplies_id)
-        if supplies is None:
+        supplycrate = self.survivor.world.get(self.survivor.supplies_id)
+        if supplycrate is None:
             return "exploring"
 
         # If we are next to the supplies, pick them up.
-        if self.survivor.location.distance_to(supplies.location) < 5.0:
-            self.survivor.world.remove_entity(supplies)
+        if self.survivor.location.distance_to(supplycrate.location) < 5.0:
+            self.survivor.world.remove_entity(supplycrate)
             self.survivor.ammo = 10
             self.survivor.health = 10
             return "exploring"
@@ -270,9 +202,9 @@ class SurvivorStateSeeking(State):
 
     def entry_actions(self):
         # Target the supplies.
-        supplies = self.survivor.world.get(self.survivor.supplies_id)
-        if supplies is not None:
-            self.survivor.destination = supplies.location
+        supplycrate = self.survivor.world.get(self.survivor.supplies_id)
+        if supplycrate is not None:
+            self.survivor.destination = supplycrate.location
 
 
 class SurvivorStateDead(State):
@@ -294,18 +226,12 @@ class SurvivorStateDead(State):
     def check_conditions(self):
         if self.survivor.health >= 10:
             return "exploring"
+        
+        elif self.survivor.health <= -200:
+            self.survivor.world.turn_survivor(self.survivor)
 
         return None
 
     def entry_actions(self):
         self.survivor.speed = 0
         self.survivor.image = self.dead_image
-
-
-class Supplies(GameEntity):
-    supply_cost = 1
-
-    """ Simple supply entity """
-
-    def __init__(self, world, resource_mgr):
-        GameEntity.__init__(self, world, "supplies", resource_mgr.supplies_image, resource_mgr)

@@ -6,8 +6,9 @@ from random import randint
 from pygame.math import Vector2
 
 from game.world import World
-from entities.graveyard import Graveyard
-from entities.survivor import Survivor, Supplies
+from entities.graveyard.entity import Graveyard
+from entities.survivor.entity import Survivor
+from entities.supplycrate.entity import SupplyCrate
 
 
 class GameScene(object):
@@ -23,11 +24,11 @@ class GameScene(object):
         self.world.supply = 20
 
         # Spawn a few graveyards
-        for _ in range(0, 5):
-            graveyard = Graveyard(self.world, self.resource_mgr)
-            graveyard.location = Vector2(randint(0, self.world_size[0]), randint(0, self.world_size[1]))
-            graveyard.brain.set_state("spawning")
-            self.world.add_entity(graveyard)
+        #for _ in range(1, 5):
+        graveyard = Graveyard(self.world, self.resource_mgr)
+        graveyard.location = Vector2(randint(0, self.world_size[0]), randint(0, self.world_size[1]))
+        graveyard.brain.set_state("spawning")
+        self.world.add_entity(graveyard)
 
     def tick(self, time_passed):
         self.world.tick(time_passed)
@@ -60,7 +61,7 @@ class GameScene(object):
         self.world.spawn_entity(Survivor, mouse_pos[0], mouse_pos[1])
 
     def handle_mouse_right_down(self, mouse_pos):
-        self.world.spawn_entity(Supplies, mouse_pos[0], mouse_pos[1])
+        self.world.spawn_entity(SupplyCrate, mouse_pos[0], mouse_pos[1])
 
     # ############ KEYBOARD INPUT MGMT ############### #
 

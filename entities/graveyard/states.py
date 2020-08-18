@@ -1,22 +1,7 @@
-""" This module contains the Graveyard Class """
-
 from time import time
 
-from entities.game_base import GameEntity, State
-from entities.zombie import Zombie
-
-
-class Graveyard(GameEntity):
-    """ The graveyard is a zombie spawn point. """
-
-    def __init__(self, world, resource_mgr):
-        GameEntity.__init__(self, world, 'graveyard', resource_mgr.graveyard_image, resource_mgr)
-
-        # Create an instance of state
-        spawning_state = GraveyardStateSpawning(self, 10, resource_mgr)
-
-        # Add the states to the state machine
-        self.brain.add_state(spawning_state)
+from entities.game_base import State
+from entities.zombie.entity import Zombie
 
 
 class GraveyardStateSpawning(State):

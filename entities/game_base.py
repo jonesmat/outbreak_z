@@ -25,13 +25,13 @@ class GameEntity(object):
 
         self.brain = StateMachine()
 
-        self.entity_id = str(uuid())
+        self.id = None  # Will be set by the World
 
         self.prev_destination = None
         self.redirect_timer = None
 
     def __str__(self):
-        return self.name + ':' + str(self.entity_id) + ' - ' + self.brain.active_state.name
+        return self.name + ':' + str(self.id) + ' - ' + self.brain.active_state.name
 
     def draw(self, surface):
         x_point, y_point = self.location
@@ -47,6 +47,7 @@ class GameEntity(object):
     def tick(self, time_passed):
         """ Triggers the entities StateMachine and locomotion """
         self.brain.think()
+
         if self.speed > 0 and self.location != self.destination:
             self._check_collisions_(time_passed)
             self._move_(time_passed)
@@ -58,23 +59,31 @@ class GameEntity(object):
 
     def _check_collisions_(self, time_passed):
         """ Checks to see if the entities current location is too close
-            to another entity, if so, randomly changes the destination
-            for the next second."""
+            to another entity, if so then the entity will attempt to spread out a bit."""
         if self.redirect_timer is None:
             # Check to make sure the entity isn't too close to another.
-            collision_distance = 2
-            blocking_entity = self.world.get_close_entity(None, self.location, collision_distance, self.entity_id)
+            collision_distance = 10
+            blocking_entity = self.world.get_close_entity(None, self.location, collision_distance, self.id)
 
             if blocking_entity is not None:
+                if self.debug_mode:
+                    print(f"{self.name}-{self.id}: Too close to {blocking_entity.name}-{blocking_entity.id}, avoiding!")
+                
                 self.prev_destination = self.destination
                 self.destination = self.get_random_destination()
-                self.redirect_timer = 1000  # 1 second
+                self.redirect_timer = .2  # 200 ms
         else:
             if self.redirect_timer > 0:
                 # Currently redirecting, decrement timer by time passed
+                if self.debug_mode:
+                    print(f"{self.name}-{self.id}: Still avoiding for {self.redirect_timer}!")
+
                 self.redirect_timer -= time_passed
             else:
                 # redirecting time expired, reset destination
+                if self.debug_mode:
+                    print(f"{self.name}-{self.id}: Completed avoidance.")
+                    
                 self.destination = self.prev_destination
                 self.prev_destination = None
                 self.redirect_timer = None
