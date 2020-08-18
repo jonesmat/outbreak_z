@@ -5,6 +5,12 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Debug Outbreak Z",
+            "type": "python",
+            "request": "launch",
+            "module": "outbreak_z"
+        },
+        {
             "name": "Python: Current File",
             "type": "python",
             "request": "launch",

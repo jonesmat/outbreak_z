@@ -2,7 +2,7 @@
 
 from pygame.math import Vector2
 
-from entities.survivor import Survivor, Supplies
+from entities.survivor.entity import Survivor, Supplies
 
 
 class World(object):

@@ -6,8 +6,8 @@ from random import randint
 from pygame.math import Vector2
 
 from game.world import World
-from entities.graveyard import Graveyard
-from entities.survivor import Survivor, Supplies
+from entities.graveyard.entity import GraveyardEntity
+from entities.survivor.entity import Survivor, Supplies
 
 
 class GameScene(object):
@@ -24,7 +24,7 @@ class GameScene(object):
 
         # Spawn a few graveyards
         for _ in range(0, 5):
-            graveyard = Graveyard(self.world, self.resource_mgr)
+            graveyard = GraveyardEntity(self.world, self.resource_mgr)
             graveyard.location = Vector2(randint(0, self.world_size[0]), randint(0, self.world_size[1]))
             graveyard.brain.set_state("spawning")
             self.world.add_entity(graveyard)

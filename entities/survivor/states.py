@@ -1,78 +1,10 @@
-""" This module contains the Survivor class and its States. """
-
 from random import randint
 from time import time
 
-import pygame
 from pygame.math import Vector2
 
-from entities.game_base import GameEntity, State
+from entities.game_base import State
 from entities.bullet import Bullet
-
-
-class Survivor(GameEntity):
-    """ The survivor entity...  """
-    supply_cost = 3
-
-    def __init__(self, world, resource_mgr):
-        GameEntity.__init__(self, world, 'survivor', resource_mgr.survivor_image, resource_mgr)
-
-        # Create an instance of each of the states
-        exploring_state = SurvivorStateExploring(self)
-        attacking_state = SurvivorStateAttacking(self, self.resource_mgr)
-        evading_state = SurvivorStateEvading(self)
-        seeking_state = SurvivorStateSeeking(self)
-        dead_state = SurvivorStateDead(self, resource_mgr.survivor_dead_image)
-
-        # Add the states to the state machine
-        self.brain.add_state(exploring_state)
-        self.brain.add_state(attacking_state)
-        self.brain.add_state(evading_state)
-        self.brain.add_state(seeking_state)
-        self.brain.add_state(dead_state)
-
-        self.health = 10
-        self.was_hit = False
-        self.ammo = 10
-        self.zombie_id = 0
-
-        self.evade_until = None
-
-    def bitten(self):
-        """ Damages the survivor and checks for death. """
-        self.health -= 1
-        self.image = self.resource_mgr.survivor_hit_image
-        self.was_hit = True
-        if self.health <= 0:
-            self.brain.set_state('dead')
-
-    def draw(self, surface):
-        """ Handles drawing of the entity """
-        # Call the draw function of the base class
-        GameEntity.draw(self, surface)
-
-        # Update survivor image to his alive image if he has restored health above 0.
-        if self.was_hit and self.health > 0:
-            self.image = self.resource_mgr.survivor_image
-            self.was_hit = False
-
-        # Draw caution icon above survivor if he's out of ammo.
-        if self.ammo < 1 and self.health > 0:
-            x_point, y_point = self.location
-            width, height = self.resource_mgr.caution_image.get_size()
-            surface.blit(self.resource_mgr.caution_image, (x_point - width / 2, (y_point - height / 2) - 10))
-
-        # Debug drawing of target zombie line.
-        if self.debug_mode:
-            if self.zombie_id:
-                zombie = self.world.get(self.zombie_id)
-                if zombie is not None:
-                    pygame.draw.line(surface, (25, 100, 255), self.location, zombie.location)
-            # blit ammo
-            surface.blit(self.resource_mgr.font.render(str(self.ammo), True, (0, 0, 0)), self.location - Vector2(20, 0))
-            # blit health
-            surface.blit(self.resource_mgr.font.render(str(self.health), True, (0, 0, 0)),
-                         self.location - Vector2(5, 22))
 
 
 class SurvivorStateExploring(State):
@@ -300,12 +232,3 @@ class SurvivorStateDead(State):
     def entry_actions(self):
         self.survivor.speed = 0
         self.survivor.image = self.dead_image
-
-
-class Supplies(GameEntity):
-    supply_cost = 1
-
-    """ Simple supply entity """
-
-    def __init__(self, world, resource_mgr):
-        GameEntity.__init__(self, world, "supplies", resource_mgr.supplies_image, resource_mgr)
