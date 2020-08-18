@@ -11,7 +11,6 @@ class ResourceMgr(object):
 
         self.background_image = pygame.image.load('resources/background.jpg').convert()
         self.zombie_image = pygame.image.load('resources/zombie.png').convert_alpha()
-        self.supplies_image = pygame.image.load('resources/supplies.png').convert_alpha()
         self.bullet_image = pygame.image.load('resources/bullet.png').convert_alpha()
         self.blood_splat_image = pygame.image.load('resources/blood_splat.png').convert_alpha()
         self.caution_image = pygame.image.load('resources/caution.png').convert_alpha()

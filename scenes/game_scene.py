@@ -7,7 +7,8 @@ from pygame.math import Vector2
 
 from game.world import World
 from entities.graveyard.entity import GraveyardEntity
-from entities.survivor.entity import Survivor, Supplies
+from entities.survivor.entity import Survivor
+from entities.supplycrate.entity import SupplyCrate
 
 
 class GameScene(object):
@@ -60,7 +61,7 @@ class GameScene(object):
         self.world.spawn_entity(Survivor, mouse_pos[0], mouse_pos[1])
 
     def handle_mouse_right_down(self, mouse_pos):
-        self.world.spawn_entity(Supplies, mouse_pos[0], mouse_pos[1])
+        self.world.spawn_entity(SupplyCrate, mouse_pos[0], mouse_pos[1])
 
     # ############ KEYBOARD INPUT MGMT ############### #
 

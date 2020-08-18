@@ -2,7 +2,10 @@ import pygame
 from pygame.math import Vector2
 
 from entities.game_base import GameEntity
+from entities.supplycrate.entity import SupplyCrate
+
 import entities.survivor.states as states
+
 
 
 class Survivor(GameEntity):
@@ -74,11 +77,3 @@ class Survivor(GameEntity):
             surface.blit(self.resource_mgr.font.render(str(self.health), True, (0, 0, 0)),
                          self.location - Vector2(5, 22))
 
-
-class Supplies(GameEntity):
-    supply_cost = 1
-
-    """ Simple supply entity """
-
-    def __init__(self, world, resource_mgr):
-        GameEntity.__init__(self, world, "supplies", resource_mgr.supplies_image, resource_mgr)

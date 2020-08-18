@@ -32,9 +32,9 @@ class SurvivorStateExploring(State):
         # If there is a nearby pile of supplies, and the survivor is low, 
         # switch to seeking state
         if self.survivor.health < 10 or self.survivor.ammo < 10:
-            supplies = self.survivor.world.get_close_entity("supplies", self.survivor.location)
-            if supplies is not None:
-                self.survivor.supplies_id = supplies.id
+            supplycrate = self.survivor.world.get_close_entity("supplycrate", self.survivor.location)
+            if supplycrate is not None:
+                self.survivor.supplies_id = supplycrate.id
                 return "seeking"
 
         return None
@@ -187,13 +187,13 @@ class SurvivorStateSeeking(State):
             return "evading"
 
         # If the supplies are gone, go back to exploring
-        supplies = self.survivor.world.get(self.survivor.supplies_id)
-        if supplies is None:
+        supplycrate = self.survivor.world.get(self.survivor.supplies_id)
+        if supplycrate is None:
             return "exploring"
 
         # If we are next to the supplies, pick them up.
-        if self.survivor.location.distance_to(supplies.location) < 5.0:
-            self.survivor.world.remove_entity(supplies)
+        if self.survivor.location.distance_to(supplycrate.location) < 5.0:
+            self.survivor.world.remove_entity(supplycrate)
             self.survivor.ammo = 10
             self.survivor.health = 10
             return "exploring"
@@ -202,9 +202,9 @@ class SurvivorStateSeeking(State):
 
     def entry_actions(self):
         # Target the supplies.
-        supplies = self.survivor.world.get(self.survivor.supplies_id)
-        if supplies is not None:
-            self.survivor.destination = supplies.location
+        supplycrate = self.survivor.world.get(self.survivor.supplies_id)
+        if supplycrate is not None:
+            self.survivor.destination = supplycrate.location
 
 
 class SurvivorStateDead(State):

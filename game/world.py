@@ -2,7 +2,8 @@
 
 from pygame.math import Vector2
 
-from entities.survivor.entity import Survivor, Supplies
+from entities.survivor.entity import Survivor
+from entities.supplycrate.entity import SupplyCrate
 
 
 class World(object):
@@ -117,10 +118,10 @@ class World(object):
                 survivor.brain.set_state("exploring")
                 self.add_entity(survivor)
                 self.supply -= 3
-            elif entity_type is Supplies:
-                supplies = Supplies(self, self.resource_mgr)
-                supplies.location = Vector2(x_point, y_point)
-                self.add_entity(supplies)
+            elif entity_type is SupplyCrate:
+                supplycrate = SupplyCrate(self, self.resource_mgr)
+                supplycrate.location = Vector2(x_point, y_point)
+                self.add_entity(supplycrate)
                 self.supply -= 1
 
     def set_debug_mode(self, debug_mode):
