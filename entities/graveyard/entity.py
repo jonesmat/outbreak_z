@@ -4,7 +4,7 @@ from entities.game_base import GameEntity
 from entities.graveyard.states import GraveyardStateSpawning
 
 
-class GraveyardEntity(GameEntity):
+class Graveyard(GameEntity):
     """ The graveyard is a zombie spawn point. """
 
     def __init__(self, world, resource_mgr):

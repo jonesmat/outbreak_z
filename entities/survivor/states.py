@@ -4,7 +4,7 @@ from time import time
 from pygame.math import Vector2
 
 from entities.game_base import State
-from entities.bullet import Bullet
+from entities.bullet.entity import Bullet
 
 
 class SurvivorStateExploring(State):
