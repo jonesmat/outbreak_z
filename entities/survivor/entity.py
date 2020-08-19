@@ -10,7 +10,8 @@ import entities.survivor.states as states
 
 class Survivor(GameEntity):
     """ The survivor entity...  """
-    supply_cost = 3
+    SUPPLY_COST = 3
+    BASE_SPEED = 3  # meters/second
 
     def __init__(self, game, resource_mgr):
 
@@ -61,19 +62,21 @@ class Survivor(GameEntity):
 
         # Draw caution icon above survivor if he's out of ammo.
         if self.ammo < 1 and self.health > 0:
-            x_point, y_point = self.location
+            dev_location = self.game.scene.get_dev_vec_from_vp_vec(self.location)
+
             width, height = self.resource_mgr.caution_image.get_size()
-            surface.blit(self.resource_mgr.caution_image, (x_point - width / 2, (y_point - height / 2) - 10))
+            surface.blit(self.resource_mgr.caution_image, (dev_location.x - width / 2, (dev_location.y - height / 2) - 10))
 
         # Debug drawing of target zombie line.
         if self.debug_mode:
             if self.zombie_id:
                 zombie = self.game.get(self.zombie_id)
                 if zombie is not None:
-                    pygame.draw.line(surface, (25, 100, 255), self.location, zombie.location)
+                    pygame.draw.line(surface, (25, 100, 255), dev_location, zombie.location)
+
             # blit ammo
-            surface.blit(self.resource_mgr.font.render(str(self.ammo), True, (0, 0, 0)), self.location - Vector2(20, 0))
+            surface.blit(self.resource_mgr.font.render(str(self.ammo), True, (0, 0, 0)), dev_location - Vector2(20, 0))
+
             # blit health
-            surface.blit(self.resource_mgr.font.render(str(self.health), True, (0, 0, 0)),
-                         self.location - Vector2(5, 22))
+            surface.blit(self.resource_mgr.font.render(str(self.health), True, (0, 0, 0)), dev_location - Vector2(5, 22))
 

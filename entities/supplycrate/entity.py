@@ -4,7 +4,7 @@ from entities.game_base import GameEntity
 
 
 class SupplyCrate(GameEntity):
-    supply_cost = 1
+    SUPPLY_COST = 1
 
     """ Simple supply entity """
     def __init__(self, game, resource_mgr):

@@ -7,11 +7,11 @@ from scenes.game_scene import GameScene
 
 def main():
     pygame.init()
-    SCREEN_SIZE = (800, 600)
+    SCREEN_SIZE = (1280, 800)
     surface = pygame.display.set_mode(SCREEN_SIZE, 0, 32)
     clock = pygame.time.Clock()
 
-    active_scene = GameScene(SCREEN_SIZE, ResourceMgr())
+    active_scene = GameScene(ResourceMgr())
     active_scene.generate_game()
 
     while True:

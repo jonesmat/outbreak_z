@@ -9,6 +9,7 @@ import entities.zombie.states as states
 
 class Zombie(GameEntity):
     """ The Zombie entity """
+    BASE_SPEED = 3  # meters/second
 
     def __init__(self, game, resource_mgr):
         self.zombie_image = pygame.image.load('entities/zombie/zombie.png').convert_alpha()

@@ -14,26 +14,28 @@ from entities.supplycrate.entity import SupplyCrate
 
 
 class GameScene(Scene):
-    def __init__(self, game_size, resource_mgr):
+    def __init__(self, resource_mgr):
         super().__init__()
-        self.viewport_rect = Rect(0, 0, 1000, 1000)
+
+        # The ViewPort rect is the rectangle that represents the "Viewport" into the real world.
+        # The units of the real world are meters.
+        self.viewport_rect = Rect(0, 0, 100, 100)
 
         # Inputs
-        self.game_size = game_size
         self.resource_mgr = resource_mgr
 
-        self.game = Game(resource_mgr, game_size)
+        self.game = Game(resource_mgr, self)
         self.debugging = False
 
     def generate_game(self):
         self.game.supply = 20
 
-        # Spawn a few graveyards
-        #for _ in range(1, 5):
-        graveyard = Graveyard(self.game, self.resource_mgr)
-        graveyard.location = Vector2(randint(0, self.game_size[0]), randint(0, self.game_size[1]))
-        graveyard.brain.set_state("spawning")
-        self.game.add_entity(graveyard)
+        # Spawn a few graveyards within the viewport
+        for _ in range(1, 5):
+            graveyard = Graveyard(self.game, self.resource_mgr)
+            graveyard.location = Vector2(randint(0, self.viewport_rect.right), randint(0, self.viewport_rect.bottom))
+            graveyard.brain.set_state("spawning")
+            self.game.add_entity(graveyard)
 
     def tick(self, time_passed):
         self.game.tick(time_passed)
@@ -47,7 +49,9 @@ class GameScene(Scene):
         self._draw_ui(surface)
 
     def _draw_ui(self, surface):
-        w_bound, h_bound = self.game.bounds
+        ''' Draw UI elements onto the surface in device coordinates '''
+        w_bound = self.game.scene.device_rect.right
+        h_bound = self.game.scene.device_rect.bottom
 
         zombies = "Zombies: " + str(self.game.get_entity_count("zombie"))
         surface.blit(self.resource_mgr.font.render(zombies, True, (0, 0, 0)), Vector2(5, h_bound - 20))
@@ -65,10 +69,10 @@ class GameScene(Scene):
     # ############ MOUSE INPUT MGMT ############### #
 
     def handle_mouse_left_down(self, mouse_pos):
-        self.game.spawn_entity(Survivor, mouse_pos[0], mouse_pos[1])
+        self.game.spawn_entity_at_device(Survivor, mouse_pos[0], mouse_pos[1])
 
     def handle_mouse_right_down(self, mouse_pos):
-        self.game.spawn_entity(SupplyCrate, mouse_pos[0], mouse_pos[1])
+        self.game.spawn_entity_at_device(SupplyCrate, mouse_pos[0], mouse_pos[1])
 
     # ############ KEYBOARD INPUT MGMT ############### #
 

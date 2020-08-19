@@ -22,8 +22,7 @@ class ZombieStateWandering(State):
 
     def check_conditions(self):
         # If there is a nearby dead survivor, switch to eating state
-        survivor = self.zombie.game.get_close_entity_in_state("survivor",
-                                                               ["dead"], self.zombie.location, 15.)
+        survivor = self.zombie.game.get_close_entity_in_state("survivor", ["dead"], self.zombie.location, 2.)
         if survivor is not None:
             self.zombie.survivor_id = survivor.id
             return "feeding"
@@ -39,7 +38,7 @@ class ZombieStateWandering(State):
 
     def entry_actions(self):
         # Start with random speed and heading
-        self.zombie.speed = 15. + randint(-3, 3)
+        self.zombie.speed = self.zombie.BASE_SPEED / 2
         self.zombie.destination = self.zombie.get_random_destination()
 
 
@@ -61,13 +60,13 @@ class ZombieStateSeeking(State):
     def check_conditions(self):
         # If no survivor in range, wander
         survivor = self.zombie.game.get_closest_entity("survivor",
-                                                        self.zombie.location, 115)
+                                                        self.zombie.location, 25)
         if survivor is None:
             self.zombie.survivor_id = 0
             return "wandering"
 
         # If the zombie is close enough to the survivor, attempt to kill it.
-        if self.zombie.location.distance_to(survivor.location) <= 15.:
+        if self.zombie.location.distance_to(survivor.location) <= 3.:
             # Give the survivor a fighting chance to avoid being killed!
             if randint(1, 5) == 1:
                 survivor.bitten()
@@ -78,7 +77,7 @@ class ZombieStateSeeking(State):
 
     def entry_actions(self):
         # Start seeking with a quickend pace.
-        self.zombie.speed = 30. + randint(-15, 15)
+        self.zombie.speed = self.zombie.BASE_SPEED
 
 
 class ZombieStateFeeding(State):
@@ -99,7 +98,7 @@ class ZombieStateFeeding(State):
 
     def check_conditions(self):
         # if no dead survivor is nearby, start wandering
-        survivor = self.zombie.game.get_close_entity_in_state("survivor", ["dead"], self.zombie.location, 15.)
+        survivor = self.zombie.game.get_close_entity_in_state("survivor", ["dead"], self.zombie.location, 2.)
         if survivor is None:
             self.zombie.survivor_id = 0
             return "wandering"

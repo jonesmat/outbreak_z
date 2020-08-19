@@ -41,7 +41,7 @@ class SurvivorStateExploring(State):
 
     def entry_actions(self):
         # Start with random speed and heading
-        self.survivor.speed = 40. + randint(-10, 10)
+        self.survivor.speed = self.survivor.BASE_SPEED
         self.survivor.destination = self.survivor.get_random_destination()
 
 
@@ -118,12 +118,11 @@ class SurvivorStateEvading(State):
         """ Determines where the zombie is, then sets the destination for an
             area in the opposite direction. """
         # Try to first find a zombie that isn't feeding, its a lesser threat.
-        zombie = self.survivor.game.get_close_entity_in_state("zombie", ["wandering", "seeking"],
-                                                               self.survivor.location, 115)
-        # If you can't find a non-feeding zombie to run from, see if a
-        # feeding one is close.
+        zombie = self.survivor.game.get_close_entity_in_state("zombie", ["wandering", "seeking"], self.survivor.location, 25)
+        
+        # If you can't find a non-feeding zombie to run from, see if a feeding one is close.
         if zombie is None:
-            zombie = self.survivor.game.get_close_entity("zombie", self.survivor.location, 115)
+            zombie = self.survivor.game.get_close_entity("zombie", self.survivor.location, 25)
 
         # If one is found, RUN!
         if zombie is not None:
@@ -137,7 +136,9 @@ class SurvivorStateEvading(State):
             vec_away = self.survivor.location - vec_to_zombie
             # Set the destination as a slightly random vector away that isn't
             # negative and also stays a bit away from the max screen size.
-            w_bound, h_bound = self.survivor.game.bounds
+            w_bound = self.survivor.game.scene.viewport_rect.right
+            h_bound = self.survivor.game.scene.viewport_rect.bottom
+
             x_point = abs(min([vec_away.x + randint(-20, 20), w_bound - 5]))
             y_point = abs(min([vec_away.y + randint(-20, 20), h_bound - 5]))
             self.survivor.destination = Vector2(x_point, y_point)
@@ -163,7 +164,7 @@ class SurvivorStateEvading(State):
         # Start with hightend speed with heading away from zombie.
         zombie = self.survivor.game.get(self.survivor.zombie_id)
         if zombie is not None:
-            self.survivor.speed = 70. + randint(-10, 10)
+            self.survivor.speed = self.survivor.BASE_SPEED * 2
             self.survivor.destination = -zombie.location
 
 
@@ -180,8 +181,7 @@ class SurvivorStateSeeking(State):
 
     def check_conditions(self):
         # If there is a nearby zombie...
-        zombie = self.survivor.game.get_closest_entity("zombie",
-                                                        self.survivor.location)
+        zombie = self.survivor.game.get_closest_entity("zombie", self.survivor.location)
         if zombie is not None:
             self.survivor.zombie_id = zombie.id
             return "evading"
@@ -192,7 +192,7 @@ class SurvivorStateSeeking(State):
             return "exploring"
 
         # If we are next to the supplies, pick them up.
-        if self.survivor.location.distance_to(supplycrate.location) < 5.0:
+        if self.survivor.location.distance_to(supplycrate.location) < 1.0:
             self.survivor.game.remove_entity(supplycrate)
             self.survivor.ammo = 10
             self.survivor.health = 10

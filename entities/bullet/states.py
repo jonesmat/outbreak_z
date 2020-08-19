@@ -17,7 +17,7 @@ class BulletStateSeeking(State):
         # If the bullet has hit the zombie...
         zombie = self.bullet.game.get(self.bullet.zombie_id)
         if zombie is not None:
-            if self.bullet.location.distance_to(zombie.location) <= 2.0:
+            if self.bullet.location.distance_to(zombie.location) <= 0.2:
                 zombie.health -= 1
                 if zombie.health <= 0:
                     self.bullet.game.remove_entity(zombie)
@@ -39,7 +39,7 @@ class BulletStateSeeking(State):
 
     def entry_actions(self):
         # Target the zombie.
-        self.bullet.speed = 200
+        self.bullet.speed = self.bullet.BASE_SPEED
         zombie = self.bullet.game.get(self.bullet.zombie_id)
         if zombie is not None:
             self.bullet.destination = zombie.location
