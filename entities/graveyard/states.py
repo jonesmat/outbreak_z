@@ -1,6 +1,6 @@
 from time import time
 
-from entities.game_base import State
+from entities.base_entity import State
 from entities.zombie.entity import Zombie
 
 

@@ -2,7 +2,7 @@ from random import randint
 
 import pygame
 
-from entities.game_base import State
+from entities.base_entity import State
 
 
 class BloodStateFading(State):

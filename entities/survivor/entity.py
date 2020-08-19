@@ -1,7 +1,7 @@
 import pygame
 from pygame.math import Vector2
 
-from entities.game_base import GameEntity
+from entities.base_entity import GameEntity
 from entities.supplycrate.entity import SupplyCrate
 
 import entities.survivor.states as states
@@ -10,8 +10,9 @@ import entities.survivor.states as states
 
 class Survivor(GameEntity):
     """ The survivor entity...  """
+    SIZE = 1  # meters wide and tall
+    BASE_SPEED = 2  # meters/second
     SUPPLY_COST = 3
-    BASE_SPEED = 3  # meters/second
 
     def __init__(self, game, resource_mgr):
 
@@ -20,6 +21,8 @@ class Survivor(GameEntity):
         self.survivor_hit_image = pygame.image.load('entities/survivor/survivor_hit.png').convert_alpha()
 
         GameEntity.__init__(self, game, 'survivor', self.survivor_image, resource_mgr)
+
+        self.size = Survivor.SIZE
 
         # Create an instance of each of the states
         exploring_state = states.SurvivorStateExploring(self)
@@ -62,7 +65,7 @@ class Survivor(GameEntity):
 
         # Draw caution icon above survivor if he's out of ammo.
         if self.ammo < 1 and self.health > 0:
-            dev_location = self.game.scene.get_dev_vec_from_vp_vec(self.location)
+            dev_location = self.game.scene.get_dev_vec_from_world_vec(self.location)
 
             width, height = self.resource_mgr.caution_image.get_size()
             surface.blit(self.resource_mgr.caution_image, (dev_location.x - width / 2, (dev_location.y - height / 2) - 10))

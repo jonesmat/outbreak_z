@@ -126,13 +126,13 @@ class Game(object):
         if self.supply - entity_type.SUPPLY_COST >= 0:
             if entity_type is Survivor:
                 survivor = Survivor(self, self.resource_mgr)
-                survivor.location = self.scene.get_vp_vec_from_device_points(x_point, y_point)
+                survivor.location = self.scene.get_world_vec_from_device_points(x_point, y_point)
                 survivor.brain.set_state("exploring")
                 self.add_entity(survivor)
                 self.supply -= 3
             elif entity_type is SupplyCrate:
                 supplycrate = SupplyCrate(self, self.resource_mgr)
-                supplycrate.location = self.scene.get_vp_vec_from_device_points(x_point, y_point)
+                supplycrate.location = self.scene.get_world_vec_from_device_points(x_point, y_point)
                 self.add_entity(supplycrate)
                 self.supply -= 1
 

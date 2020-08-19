@@ -1,4 +1,4 @@
-from entities.game_base import State
+from entities.base_entity import State
 from entities.bloodsplat.entity import BloodSplat
 
 
