@@ -12,13 +12,13 @@ class Survivor(GameEntity):
     """ The survivor entity...  """
     supply_cost = 3
 
-    def __init__(self, world, resource_mgr):
+    def __init__(self, game, resource_mgr):
 
         self.survivor_image = pygame.image.load('entities/survivor/survivor.png').convert_alpha()
         self.survivor_dead_image = pygame.image.load('entities/survivor/survivor_dead.png').convert_alpha()
         self.survivor_hit_image = pygame.image.load('entities/survivor/survivor_hit.png').convert_alpha()
 
-        GameEntity.__init__(self, world, 'survivor', self.survivor_image, resource_mgr)
+        GameEntity.__init__(self, game, 'survivor', self.survivor_image, resource_mgr)
 
         # Create an instance of each of the states
         exploring_state = states.SurvivorStateExploring(self)
@@ -68,7 +68,7 @@ class Survivor(GameEntity):
         # Debug drawing of target zombie line.
         if self.debug_mode:
             if self.zombie_id:
-                zombie = self.world.get(self.zombie_id)
+                zombie = self.game.get(self.zombie_id)
                 if zombie is not None:
                     pygame.draw.line(surface, (25, 100, 255), self.location, zombie.location)
             # blit ammo

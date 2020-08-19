@@ -12,7 +12,7 @@ def main():
     clock = pygame.time.Clock()
 
     active_scene = GameScene(SCREEN_SIZE, ResourceMgr())
-    active_scene.generate_world()
+    active_scene.generate_game()
 
     while True:
 

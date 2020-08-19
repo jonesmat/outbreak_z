@@ -9,13 +9,13 @@ import entities.bloodsplat.states as states
 class BloodSplat(GameEntity):
     """ When Bullet meets Zombie, splat! """
 
-    def __init__(self, world, resource_mgr):
+    def __init__(self, game, resource_mgr):
         self.blood_splat_image = pygame.image.load('entities/bloodsplat/blood_splat.png').convert_alpha()
 
         # Set random image rotation.
         rotate = pygame.transform.rotate
         rotation = randint(1, 360)
-        GameEntity.__init__(self, world, "bloodsplat", rotate(self.blood_splat_image, rotation), resource_mgr)
+        GameEntity.__init__(self, game, "bloodsplat", rotate(self.blood_splat_image, rotation), resource_mgr)
 
         # Create an instance of each of the states
         fading_state = states.BloodStateFading(self)

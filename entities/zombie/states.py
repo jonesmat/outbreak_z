@@ -22,14 +22,14 @@ class ZombieStateWandering(State):
 
     def check_conditions(self):
         # If there is a nearby dead survivor, switch to eating state
-        survivor = self.zombie.world.get_close_entity_in_state("survivor",
+        survivor = self.zombie.game.get_close_entity_in_state("survivor",
                                                                ["dead"], self.zombie.location, 15.)
         if survivor is not None:
             self.zombie.survivor_id = survivor.id
             return "feeding"
 
         # If there is a nearby survivor, switch to seeking state
-        survivor = self.zombie.world.get_close_entity("survivor",
+        survivor = self.zombie.game.get_close_entity("survivor",
                                                       self.zombie.location)
         if survivor is not None:
             self.zombie.survivor_id = survivor.id
@@ -52,7 +52,7 @@ class ZombieStateSeeking(State):
 
     def do_actions(self):
         # Keep the closes survivor as the target.
-        survivor = self.zombie.world.get_closest_entity("survivor",
+        survivor = self.zombie.game.get_closest_entity("survivor",
                                                         self.zombie.location)
         if survivor is not None:
             self.zombie.survivor_id = survivor.id
@@ -60,7 +60,7 @@ class ZombieStateSeeking(State):
 
     def check_conditions(self):
         # If no survivor in range, wander
-        survivor = self.zombie.world.get_closest_entity("survivor",
+        survivor = self.zombie.game.get_closest_entity("survivor",
                                                         self.zombie.location, 115)
         if survivor is None:
             self.zombie.survivor_id = 0
@@ -93,13 +93,13 @@ class ZombieStateFeeding(State):
 
     def do_actions(self):
         # Bit the survivor
-        survivor = self.zombie.world.get(self.zombie.survivor_id)
+        survivor = self.zombie.game.get(self.zombie.survivor_id)
         if survivor is not None:
             survivor.bitten()
 
     def check_conditions(self):
         # if no dead survivor is nearby, start wandering
-        survivor = self.zombie.world.get_close_entity_in_state("survivor", ["dead"], self.zombie.location, 15.)
+        survivor = self.zombie.game.get_close_entity_in_state("survivor", ["dead"], self.zombie.location, 15.)
         if survivor is None:
             self.zombie.survivor_id = 0
             return "wandering"

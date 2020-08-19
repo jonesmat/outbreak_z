@@ -10,12 +10,12 @@ from pygame.math import Vector2
 
 class GameEntity(object):
     """ The base object for any entity that will exist inside the game
-        world.  This class handles the drawing and processing each tick. """
+        game.  This class handles the drawing and processing each tick. """
 
-    def __init__(self, world, name, image, resource_mgr):
+    def __init__(self, game, name, image, resource_mgr):
         self.debug_mode = False
 
-        self.world = world
+        self.game = game
         self.name = name
         self.image = image
         self.resource_mgr = resource_mgr
@@ -25,7 +25,7 @@ class GameEntity(object):
 
         self.brain = StateMachine()
 
-        self.id = None  # Will be set by the World
+        self.id = None  # Will be set by the Game
 
         self.prev_destination = None
         self.redirect_timer = None
@@ -53,8 +53,8 @@ class GameEntity(object):
             self._move_(time_passed)
 
     def get_random_destination(self):
-        """ Returns a random vector within the world bounds """
-        width, height = self.world.bounds
+        """ Returns a random vector within the game bounds """
+        width, height = self.game.bounds
         return Vector2(randint(0, width), randint(0, height))
 
     def _check_collisions_(self, time_passed):
@@ -63,7 +63,7 @@ class GameEntity(object):
         if self.redirect_timer is None:
             # Check to make sure the entity isn't too close to another.
             collision_distance = 10
-            blocking_entity = self.world.get_close_entity(None, self.location, collision_distance, self.id)
+            blocking_entity = self.game.get_close_entity(None, self.location, collision_distance, self.id)
 
             if blocking_entity is not None:
                 if self.debug_mode:
@@ -90,7 +90,7 @@ class GameEntity(object):
 
     def _move_(self, time_passed):
         """ Provides locomotion for the entity while ensuring it stays
-            within the world bounds. """
+            within the game bounds. """
         vec_to_destination = self.destination - self.location
         distance_to_destination = vec_to_destination.length()
         heading = vec_to_destination.normalize()
@@ -100,12 +100,12 @@ class GameEntity(object):
         # Ensure the entity stays within the boundaries:
         if self.location.x < 0:
             self.location.x = 0
-        if self.location.x > self.world.bounds[0]:
-            self.location.x = self.world.bounds[0]
+        if self.location.x > self.game.bounds[0]:
+            self.location.x = self.game.bounds[0]
         if self.location.y < 0:
             self.location.y = 0
-        if self.location.y > self.world.bounds[1]:
-            self.location.y = self.world.bounds[1]
+        if self.location.y > self.game.bounds[1]:
+            self.location.y = self.game.bounds[1]
 
 
 class State(object):

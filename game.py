@@ -1,4 +1,4 @@
-""" This module contains the World class """
+""" This module contains the Game class """
 
 from pygame.math import Vector2
 
@@ -7,8 +7,8 @@ from entities.supplycrate.entity import SupplyCrate
 from entities.zombie.entity import Zombie
 
 
-class World(object):
-    """ The World class keeps track of all entities within its bounds. """
+class Game(object):
+    """ The Game class keeps track of all entities within its bounds. """
 
     def __init__(self, resource_mgr, screen_bounds):
         self.resource_mgr = resource_mgr
@@ -27,7 +27,7 @@ class World(object):
         self.next_entity_id += 1
 
     def remove_entity(self, entity):
-        """ Removes the entity from the world """
+        """ Removes the entity from the game """
         del self.entities[entity.id]
 
     def get(self, id):
@@ -104,7 +104,7 @@ class World(object):
         return None
 
     def get_entity_count(self, name):
-        """ Gets the number of entities in the world with that name. """
+        """ Gets the number of entities in the game with that name. """
         count = 0
         for entity in self.entities.values():
             if entity.name == name:
