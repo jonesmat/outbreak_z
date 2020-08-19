@@ -19,8 +19,8 @@ class GameEntity(object):
         self.name = name
         self.image = image
         self.resource_mgr = resource_mgr
-        self.location = Vector2(0, 0)  # location always in "Viewport" coordinates
-        self.destination = Vector2(0, 0)  # destination always in "Viewport" coordinates
+        self.location = Vector2(0, 0)  # location always in "world" coordinates
+        self.destination = Vector2(0, 0)  # destination always in "world" coordinates
         self.size = 1  # meters wide and tall
         self.speed = 0.  # meters/second
 
@@ -35,8 +35,8 @@ class GameEntity(object):
         return self.name + ':' + str(self.id) + ' - ' + self.brain.active_state.name
 
     def draw(self, surface):
-        # Convert the "Viewport" coordinates into "Device" coordinates for drawing
-        dev_location = self.game.scene.get_dev_vec_from_vp_vec(self.location)
+        # Convert the "world" coordinates into "Device" coordinates for drawing
+        dev_location = self.game.scene.get_dev_vec_from_world_vec(self.location)
 
         width, height = self.image.get_size()
         surface.blit(self.image, (dev_location.x - width / 2, dev_location.y - height / 2))
@@ -56,8 +56,8 @@ class GameEntity(object):
             self._move_(time_passed)
 
     def get_random_destination(self):
-        """ Returns a random vector within the viewport """
-        return Vector2(randint(0, self.game.scene.viewport_rect.right), randint(0, self.game.scene.viewport_rect.bottom))
+        """ Returns a random vector within the world """
+        return Vector2(randint(0, self.game.scene.world_rect.right), randint(0, self.game.scene.world_rect.bottom))
 
     def _check_collisions_(self, time_passed):
         """ Checks to see if the entities current location is too close
@@ -91,7 +91,7 @@ class GameEntity(object):
                 self.redirect_timer = None
 
     def _move_(self, time_passed):
-        """ Provides locomotion for the entity while ensuring it stays within the viewport. """
+        """ Provides locomotion for the entity while ensuring it stays within the world. """
         vec_to_destination = self.destination - self.location
         distance_to_destination = vec_to_destination.length()
         heading = vec_to_destination.normalize()
@@ -101,12 +101,12 @@ class GameEntity(object):
         # Ensure the entity stays within the boundaries:
         if self.location.x < 0:
             self.location.x = 0
-        if self.location.x > self.game.scene.viewport_rect.right:
-            self.location.x = self.game.scene.viewport_rect.right
+        if self.location.x > self.game.scene.world_rect.right:
+            self.location.x = self.game.scene.world_rect.right
         if self.location.y < 0:
             self.location.y = 0
-        if self.location.y > self.game.scene.viewport_rect.bottom:
-            self.location.y = self.game.scene.viewport_rect.bottom
+        if self.location.y > self.game.scene.world_rect.bottom:
+            self.location.y = self.game.scene.world_rect.bottom
 
 
 class State(object):
