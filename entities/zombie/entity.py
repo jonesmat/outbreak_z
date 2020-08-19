@@ -9,11 +9,12 @@ import entities.zombie.states as states
 
 class Zombie(GameEntity):
     """ The Zombie entity """
+    BASE_SPEED = 3  # meters/second
 
-    def __init__(self, world, resource_mgr):
+    def __init__(self, game, resource_mgr):
         self.zombie_image = pygame.image.load('entities/zombie/zombie.png').convert_alpha()
 
-        GameEntity.__init__(self, world, 'zombie', self.zombie_image, resource_mgr)
+        GameEntity.__init__(self, game, 'zombie', self.zombie_image, resource_mgr)
 
         # Create an instance of state
         wandering_state = states.ZombieStateWandering(self)
@@ -36,7 +37,7 @@ class Zombie(GameEntity):
         # Debug drawing of target survivor line.
         if self.debug_mode:
             if self.survivor_id:
-                survivor = self.world.get(self.survivor_id)
+                survivor = self.game.get(self.survivor_id)
                 if survivor is not None:
                     pygame.draw.line(surface, (255, 25, 25), self.location,
                                      survivor.location)

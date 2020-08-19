@@ -24,7 +24,7 @@ class SurvivorStateExploring(State):
 
     def check_conditions(self):
         # If there is a nearby zombie...
-        zombie = self.survivor.world.get_closest_entity("zombie", self.survivor.location)
+        zombie = self.survivor.game.get_closest_entity("zombie", self.survivor.location)
         if zombie is not None:
             self.survivor.zombie_id = zombie.id
             return "evading"
@@ -32,7 +32,7 @@ class SurvivorStateExploring(State):
         # If there is a nearby pile of supplies, and the survivor is low, 
         # switch to seeking state
         if self.survivor.health < 10 or self.survivor.ammo < 10:
-            supplycrate = self.survivor.world.get_close_entity("supplycrate", self.survivor.location)
+            supplycrate = self.survivor.game.get_close_entity("supplycrate", self.survivor.location)
             if supplycrate is not None:
                 self.survivor.supplies_id = supplycrate.id
                 return "seeking"
@@ -41,7 +41,7 @@ class SurvivorStateExploring(State):
 
     def entry_actions(self):
         # Start with random speed and heading
-        self.survivor.speed = 40. + randint(-10, 10)
+        self.survivor.speed = self.survivor.BASE_SPEED
         self.survivor.destination = self.survivor.get_random_destination()
 
 
@@ -58,14 +58,14 @@ class SurvivorStateAttacking(State):
 
     def shoot_zombie(self):
         """ Acquires the zombie, spawns a bullet, and decrements the ammo """
-        zombie = self.survivor.world.get(self.survivor.zombie_id)
+        zombie = self.survivor.game.get(self.survivor.zombie_id)
         if zombie is not None:
-            bullet = Bullet(self.survivor.world, self.resource_mgr)
+            bullet = Bullet(self.survivor.game, self.resource_mgr)
             bullet.location = self.survivor.location
             bullet.zombie_id = zombie.id
             bullet.brain.set_state("seeking")
 
-            self.survivor.world.add_entity(bullet)
+            self.survivor.game.add_entity(bullet)
             self.survivor.ammo -= 1
 
     def do_actions(self):
@@ -75,7 +75,7 @@ class SurvivorStateAttacking(State):
 
     def check_conditions(self):
         # If there isn't a nearby zombie, switch to exploring state
-        zombie = self.survivor.world.get_closest_entity("zombie", self.survivor.location)
+        zombie = self.survivor.game.get_closest_entity("zombie", self.survivor.location)
         if zombie is None:
             self.survivor.zombie_id = None
             return "exploring"
@@ -118,12 +118,11 @@ class SurvivorStateEvading(State):
         """ Determines where the zombie is, then sets the destination for an
             area in the opposite direction. """
         # Try to first find a zombie that isn't feeding, its a lesser threat.
-        zombie = self.survivor.world.get_close_entity_in_state("zombie", ["wandering", "seeking"],
-                                                               self.survivor.location, 115)
-        # If you can't find a non-feeding zombie to run from, see if a
-        # feeding one is close.
+        zombie = self.survivor.game.get_close_entity_in_state("zombie", ["wandering", "seeking"], self.survivor.location, 25)
+        
+        # If you can't find a non-feeding zombie to run from, see if a feeding one is close.
         if zombie is None:
-            zombie = self.survivor.world.get_close_entity("zombie", self.survivor.location, 115)
+            zombie = self.survivor.game.get_close_entity("zombie", self.survivor.location, 25)
 
         # If one is found, RUN!
         if zombie is not None:
@@ -137,7 +136,9 @@ class SurvivorStateEvading(State):
             vec_away = self.survivor.location - vec_to_zombie
             # Set the destination as a slightly random vector away that isn't
             # negative and also stays a bit away from the max screen size.
-            w_bound, h_bound = self.survivor.world.bounds
+            w_bound = self.survivor.game.scene.viewport_rect.right
+            h_bound = self.survivor.game.scene.viewport_rect.bottom
+
             x_point = abs(min([vec_away.x + randint(-20, 20), w_bound - 5]))
             y_point = abs(min([vec_away.y + randint(-20, 20), h_bound - 5]))
             self.survivor.destination = Vector2(x_point, y_point)
@@ -145,7 +146,7 @@ class SurvivorStateEvading(State):
     def check_conditions(self):
         if self.survivor.evade_until is None:
             # Attack a near zombie if we have ammo.
-            zombie = self.survivor.world.get_close_entity("zombie", self.survivor.location)
+            zombie = self.survivor.game.get_close_entity("zombie", self.survivor.location)
             if zombie is not None and self.survivor.ammo > 0:
                 return "attacking"
 
@@ -161,9 +162,9 @@ class SurvivorStateEvading(State):
 
     def entry_actions(self):
         # Start with hightend speed with heading away from zombie.
-        zombie = self.survivor.world.get(self.survivor.zombie_id)
+        zombie = self.survivor.game.get(self.survivor.zombie_id)
         if zombie is not None:
-            self.survivor.speed = 70. + randint(-10, 10)
+            self.survivor.speed = self.survivor.BASE_SPEED * 2
             self.survivor.destination = -zombie.location
 
 
@@ -180,20 +181,19 @@ class SurvivorStateSeeking(State):
 
     def check_conditions(self):
         # If there is a nearby zombie...
-        zombie = self.survivor.world.get_closest_entity("zombie",
-                                                        self.survivor.location)
+        zombie = self.survivor.game.get_closest_entity("zombie", self.survivor.location)
         if zombie is not None:
             self.survivor.zombie_id = zombie.id
             return "evading"
 
         # If the supplies are gone, go back to exploring
-        supplycrate = self.survivor.world.get(self.survivor.supplies_id)
+        supplycrate = self.survivor.game.get(self.survivor.supplies_id)
         if supplycrate is None:
             return "exploring"
 
         # If we are next to the supplies, pick them up.
-        if self.survivor.location.distance_to(supplycrate.location) < 5.0:
-            self.survivor.world.remove_entity(supplycrate)
+        if self.survivor.location.distance_to(supplycrate.location) < 1.0:
+            self.survivor.game.remove_entity(supplycrate)
             self.survivor.ammo = 10
             self.survivor.health = 10
             return "exploring"
@@ -202,7 +202,7 @@ class SurvivorStateSeeking(State):
 
     def entry_actions(self):
         # Target the supplies.
-        supplycrate = self.survivor.world.get(self.survivor.supplies_id)
+        supplycrate = self.survivor.game.get(self.survivor.supplies_id)
         if supplycrate is not None:
             self.survivor.destination = supplycrate.location
 
@@ -228,7 +228,7 @@ class SurvivorStateDead(State):
             return "exploring"
         
         elif self.survivor.health <= -200:
-            self.survivor.world.turn_survivor(self.survivor)
+            self.survivor.game.turn_survivor(self.survivor)
 
         return None
 

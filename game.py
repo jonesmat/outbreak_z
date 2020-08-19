@@ -1,4 +1,4 @@
-""" This module contains the World class """
+""" This module contains the Game class """
 
 from pygame.math import Vector2
 
@@ -7,13 +7,12 @@ from entities.supplycrate.entity import SupplyCrate
 from entities.zombie.entity import Zombie
 
 
-class World(object):
-    """ The World class keeps track of all entities within its bounds. """
+class Game(object):
 
-    def __init__(self, resource_mgr, screen_bounds):
+    def __init__(self, resource_mgr, scene):
         self.resource_mgr = resource_mgr
         self.background = resource_mgr.background_image
-        self.bounds = screen_bounds
+        self.scene = scene
 
         self.entities = {}  # Store all the entities
         self.next_entity_id = 0  # Next entity id assigned
@@ -27,7 +26,7 @@ class World(object):
         self.next_entity_id += 1
 
     def remove_entity(self, entity):
-        """ Removes the entity from the world """
+        """ Removes the entity from the game """
         del self.entities[entity.id]
 
     def get(self, id):
@@ -51,14 +50,27 @@ class World(object):
                 pass
 
     def draw(self, surface):
-        surface.blit(self.background, (0, 0))
+        self._draw_background(surface)
 
         for entity in self.entities.values():
             entity.draw(surface)
 
-    def get_close_entity(self, name, location, radius=100., ignore_id=None):
+    def _draw_background(self, surface):
+        background_width, background_height = self.background.get_size()
+
+        drawn_x = 0
+        while drawn_x < self.scene.device_rect.right:
+            
+            drawn_y = 0
+            while drawn_y < self.scene.device_rect.bottom:
+                surface.blit(self.background, (drawn_x, drawn_y))
+                drawn_y += background_height
+
+            drawn_x += background_width
+        
+
+    def get_close_entity(self, name, location: Vector2, radius=20., ignore_id=None):
         """ Finds the first entity within range of a location """
-        location = Vector2(location)
 
         for entity in self.entities.values():
             # If an ignore_id is passed, ignore the entity with that id.
@@ -71,9 +83,8 @@ class World(object):
                     return entity
         return None
 
-    def get_closest_entity(self, name, location, radius=100.):
+    def get_closest_entity(self, name, location: Vector2, radius=20.):
         """ Find the closest entity within range of a location """
-        location = Vector2(location)
 
         close_entities = []
         for entity in self.entities.values():
@@ -90,10 +101,10 @@ class World(object):
 
         return None
 
-    def get_close_entity_in_state(self, name, states, location, radius=100.):
+    def get_close_entity_in_state(self, name, states, location: Vector2, radius=20.):
         """ Find an entity within range of a location that is in one of the
             states provided. """
-        location = Vector2(location)
+
         for entity in self.entities.values():
             if entity.name == name:
                 for state in states:
@@ -104,24 +115,24 @@ class World(object):
         return None
 
     def get_entity_count(self, name):
-        """ Gets the number of entities in the world with that name. """
+        """ Gets the number of entities in the game with that name. """
         count = 0
         for entity in self.entities.values():
             if entity.name == name:
                 count += 1
         return count
 
-    def spawn_entity(self, entity_type, x_point, y_point):
-        if self.supply - entity_type.supply_cost >= 0:
+    def spawn_entity_at_device(self, entity_type, x_point, y_point):
+        if self.supply - entity_type.SUPPLY_COST >= 0:
             if entity_type is Survivor:
                 survivor = Survivor(self, self.resource_mgr)
-                survivor.location = Vector2(x_point, y_point)
+                survivor.location = self.scene.get_vp_vec_from_device_points(x_point, y_point)
                 survivor.brain.set_state("exploring")
                 self.add_entity(survivor)
                 self.supply -= 3
             elif entity_type is SupplyCrate:
                 supplycrate = SupplyCrate(self, self.resource_mgr)
-                supplycrate.location = Vector2(x_point, y_point)
+                supplycrate.location = self.scene.get_vp_vec_from_device_points(x_point, y_point)
                 self.add_entity(supplycrate)
                 self.supply -= 1
 

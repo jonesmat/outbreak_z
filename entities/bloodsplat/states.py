@@ -21,7 +21,7 @@ class BloodStateFading(State):
     def check_conditions(self):
         alpha = self.blood.image.get_alpha()
         if alpha <= 0:
-            self.blood.world.remove_entity(self.blood)
+            self.blood.game.remove_entity(self.blood)
 
     def entry_actions(self):
         self.blood.image.set_alpha(255)

@@ -18,11 +18,11 @@ class GraveyardStateSpawning(State):
 
     def do_actions(self):
         if time() > self.next_spawn:
-            zombie = Zombie(self.graveyard.world, self.resource_mgr)
+            zombie = Zombie(self.graveyard.game, self.resource_mgr)
             zombie.location = self.graveyard.location
             zombie.brain.set_state("wandering")
 
-            self.graveyard.world.add_entity(zombie)
+            self.graveyard.game.add_entity(zombie)
 
             self.next_spawn = time() + self.spawn_rate
 
