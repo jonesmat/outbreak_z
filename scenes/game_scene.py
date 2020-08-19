@@ -17,9 +17,9 @@ class GameScene(Scene):
     def __init__(self, resource_mgr):
         super().__init__()
 
-        # The world rect is the rectangle that represents the "world" into the real world.
-        # The units of the real world are meters.
-        self.world_rect = Rect(0, 0, 100, 100)
+        # The viewport rect is the rectangle that represents the "viewport" into the real viewport.
+        # The units of the real viewport are meters.
+        self.viewport_rect = Rect(0, 0, 100, 100)
 
         # Inputs
         self.resource_mgr = resource_mgr
@@ -30,10 +30,10 @@ class GameScene(Scene):
     def generate_game(self):
         self.game.supply = 20
 
-        # Spawn a few graveyards within the world
+        # Spawn a few graveyards within the viewport
         for _ in range(1, 5):
             graveyard = Graveyard(self.game, self.resource_mgr)
-            graveyard.location = Vector2(randint(0, self.world_rect.right), randint(0, self.world_rect.bottom))
+            graveyard.location = Vector2(randint(0, self.viewport_rect.right), randint(0, self.viewport_rect.bottom))
             graveyard.brain.set_state("spawning")
             self.game.add_entity(graveyard)
 

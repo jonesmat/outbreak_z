@@ -65,7 +65,7 @@ class Survivor(GameEntity):
 
         # Draw caution icon above survivor if he's out of ammo.
         if self.ammo < 1 and self.health > 0:
-            dev_location = self.game.scene.get_dev_vec_from_world_vec(self.location)
+            dev_location = self.game.scene.get_dev_vec_from_viewport_vec(self.location)
 
             width, height = self.resource_mgr.caution_image.get_size()
             surface.blit(self.resource_mgr.caution_image, (dev_location.x - width / 2, (dev_location.y - height / 2) - 10))

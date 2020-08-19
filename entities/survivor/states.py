@@ -136,8 +136,8 @@ class SurvivorStateEvading(State):
             vec_away = self.survivor.location - vec_to_zombie
             # Set the destination as a slightly random vector away that isn't
             # negative and also stays a bit away from the max screen size.
-            w_bound = self.survivor.game.scene.world_rect.right
-            h_bound = self.survivor.game.scene.world_rect.bottom
+            w_bound = self.survivor.game.scene.viewport_rect.right
+            h_bound = self.survivor.game.scene.viewport_rect.bottom
 
             x_point = abs(min([vec_away.x + randint(-20, 20), w_bound - 5]))
             y_point = abs(min([vec_away.y + randint(-20, 20), h_bound - 5]))
