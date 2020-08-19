@@ -3,7 +3,9 @@
 
 from random import randint
 
+from pygame import Rect
 from pygame.math import Vector2
+from scenes.base_scene import Scene
 
 from game.world import World
 from entities.graveyard.entity import Graveyard
@@ -11,8 +13,11 @@ from entities.survivor.entity import Survivor
 from entities.supplycrate.entity import SupplyCrate
 
 
-class GameScene(object):
+class GameScene(Scene):
     def __init__(self, world_size, resource_mgr):
+        super().__init__()
+        self.viewport_rect = Rect(0, 0, 1000, 1000)
+
         # Inputs
         self.world_size = world_size
         self.resource_mgr = resource_mgr
@@ -36,6 +41,8 @@ class GameScene(object):
     # ############## DRAWING ############## #
 
     def draw(self, surface):
+        self.device_rect = surface.get_rect()
+
         self.world.draw(surface)
         self._draw_ui(surface)
 
