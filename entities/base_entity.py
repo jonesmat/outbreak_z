@@ -21,7 +21,8 @@ class GameEntity(object):
         self.resource_mgr = resource_mgr
         self.location = Vector2(0, 0)  # location always in "Viewport" coordinates
         self.destination = Vector2(0, 0)  # destination always in "Viewport" coordinates
-        self.speed = 0.
+        self.size = 1  # meters wide and tall
+        self.speed = 0.  # meters/second
 
         self.brain = StateMachine()
 

@@ -3,18 +3,21 @@ from random import randint
 import pygame
 from pygame.math import Vector2
 
-from entities.game_base import GameEntity
+from entities.base_entity import GameEntity
 import entities.zombie.states as states
 
 
 class Zombie(GameEntity):
     """ The Zombie entity """
-    BASE_SPEED = 3  # meters/second
+    SIZE = 1  # meters wide and tall
+    BASE_SPEED = 1  # meters/second
 
     def __init__(self, game, resource_mgr):
         self.zombie_image = pygame.image.load('entities/zombie/zombie.png').convert_alpha()
 
         GameEntity.__init__(self, game, 'zombie', self.zombie_image, resource_mgr)
+
+        self.size = Zombie.SIZE
 
         # Create an instance of state
         wandering_state = states.ZombieStateWandering(self)

@@ -3,7 +3,7 @@ from time import time
 
 from pygame.math import Vector2
 
-from entities.game_base import State
+from entities.base_entity import State
 from entities.bullet.entity import Bullet
 
 

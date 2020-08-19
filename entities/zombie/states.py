@@ -3,7 +3,7 @@ from random import randint
 import pygame
 from pygame.math import Vector2
 
-from entities.game_base import GameEntity, State
+from entities.base_entity import GameEntity, State
 
 
 class ZombieStateWandering(State):

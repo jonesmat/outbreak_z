@@ -1,7 +1,7 @@
 import pygame
 from pygame.math import Vector2
 
-from entities.game_base import GameEntity
+from entities.base_entity import GameEntity
 from entities.supplycrate.entity import SupplyCrate
 
 import entities.survivor.states as states
@@ -10,8 +10,9 @@ import entities.survivor.states as states
 
 class Survivor(GameEntity):
     """ The survivor entity...  """
+    SIZE = 1  # meters wide and tall
+    BASE_SPEED = 2  # meters/second
     SUPPLY_COST = 3
-    BASE_SPEED = 3  # meters/second
 
     def __init__(self, game, resource_mgr):
 
@@ -20,6 +21,8 @@ class Survivor(GameEntity):
         self.survivor_hit_image = pygame.image.load('entities/survivor/survivor_hit.png').convert_alpha()
 
         GameEntity.__init__(self, game, 'survivor', self.survivor_image, resource_mgr)
+
+        self.size = Survivor.SIZE
 
         # Create an instance of each of the states
         exploring_state = states.SurvivorStateExploring(self)
